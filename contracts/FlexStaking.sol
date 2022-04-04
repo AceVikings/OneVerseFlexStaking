@@ -25,8 +25,6 @@ contract FlexStaking is Ownable{
     uint private _totalSupply;
     mapping(address=>uint) public balances;
 
-    uint lockedGrav;
-
     address[] userStaked;
 
     struct stakeInfo{
@@ -71,7 +69,6 @@ contract FlexStaking is Ownable{
         }
         _totalSupply += _amount;
         balances[msg.sender] += _amount;
-        lockedGrav += _amount;
         GRAV.transferFrom(msg.sender,address(this), _amount);
     }
 
@@ -79,7 +76,6 @@ contract FlexStaking is Ownable{
         require(balances[msg.sender] >= _amount,"Not enough balance");
         _totalSupply -= _amount;
         balances[msg.sender] -= _amount;
-        lockedGrav -= _amount;
         GRAV.transfer(msg.sender,_amount);
         if(balances[msg.sender] == 0){
             uint reward = rewards[msg.sender];
@@ -123,7 +119,7 @@ contract FlexStaking is Ownable{
     }
 
     function retrieveGrav() external onlyOwner{
-        GRAV.transfer(msg.sender, GRAV.balanceOf(address(this))-lockedGrav);
+        GRAV.transfer(msg.sender, GRAV.balanceOf(address(this))-_totalSupply);
     }
 
 }
